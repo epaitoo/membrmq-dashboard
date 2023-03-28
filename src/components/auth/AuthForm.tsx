@@ -17,30 +17,30 @@ const AuthForm = ({ isSignUp }: IsSignUpProp): JSX.Element => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // handle form submission
-    // if (!email || !password) {
-    //   setErrorMessage('Please enter a valid email and password');
-    //   return;
-    // }
+    
+    if (!email || !password) {
+      setErrorMessage('Please enter a valid email and password');
+      return;
+    }
 
-    // try {
-    //   if (!isSignUp) {
-    //     const res = await axios.post('/api/login', { email, password });
+    try {
+      if (!isSignUp) {
+        const res = await axios.post('/api/login', { email, password });
 
-    //     if (res.status == 200) {
-    //       router.push('/');
-    //     }
-    //   } else {
-    //     const res = await axios.post('/api/register', { email, password });
+        if (res.status == 200) {
+          router.push('/');
+        }
+      } else {
+        const res = await axios.post('/api/register', { email, password });
 
-    //     if (res.status == 200) {
-    //       router.push('/');
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   setErrorMessage('An error occurred while signing up');
-    // }
+        if (res.status == 200) {
+          router.push('/');
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMessage('An error occurred while signing up');
+    }
   };
 
   return (
