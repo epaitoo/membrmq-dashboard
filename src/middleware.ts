@@ -1,25 +1,34 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server'
-import { ACCESS_TOKEN, REFRESH_TOKEN, isTokenExpired } from './utils/tokenHelpers';
+import type { NextRequest } from 'next/server';
+import {
+  ACCESS_TOKEN,
+  REFRESH_TOKEN,
+  isTokenExpired,
+} from './utils/tokenHelpers';
 import { API_BASEURL } from './utils/api';
 
 export async function middleware(request: NextRequest) {
-
-  const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value; 
-  const unauthenticated: boolean = !request.cookies.has(ACCESS_TOKEN) && 
-                                      !request.cookies.has(REFRESH_TOKEN)
+  const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value;
+  const unauthenticated: boolean =
+    !request.cookies.has(ACCESS_TOKEN) && !request.cookies.has(REFRESH_TOKEN);
 
   // if (request.url.includes('_next')) return;
 
   if (unauthenticated && !request.url.includes('/auth/signin')) {
-    return NextResponse.redirect(new URL('/auth/signin', request.url))
+    return NextResponse.redirect(new URL('/auth/signin', request.url));
   }
 
-  if (request.cookies.has(ACCESS_TOKEN) && request.url.includes('/auth/signin')) {
-    return NextResponse.redirect(new URL('/', request.url))
+  if (
+    request.cookies.has(ACCESS_TOKEN) &&
+    request.url.includes('/auth/signin')
+  ) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (!request.cookies.has(ACCESS_TOKEN) && request.cookies.has(REFRESH_TOKEN)) {
+  if (
+    !request.cookies.has(ACCESS_TOKEN) &&
+    request.cookies.has(REFRESH_TOKEN)
+  ) {
     if (!isTokenExpired(refreshToken)) {
       try {
         const response = await fetch(`${API_BASEURL}/auth/refresh`, {
@@ -51,18 +60,15 @@ export async function middleware(request: NextRequest) {
 
           return nextRes;
         }
-        
       } catch (error) {
         console.log('error with token refresh:', error);
       }
     }
-} 
+  }
 
   return NextResponse.next();
-
 }
 
-export const config = { 
-  matcher: ['/', '/members'],
-}
-
+export const config = {
+  matcher: ['/', '/members', '/members/:path*', '/api/members/:path*'],
+};

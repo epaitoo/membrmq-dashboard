@@ -1,7 +1,30 @@
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
+import { useState } from 'react';
 import { RxPerson } from 'react-icons/rx';
+import { Member } from '../../../utils/member';
 
-const MemberForm = () => {
+interface MemberFormFieldsProps { 
+  member?: Member;
+  action?: string;
+}
+
+
+
+const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
+  let formattedDate: string = '';
+  if (member?.birthday !== undefined) {
+    const date = new Date(member?.birthday);
+    formattedDate = date.toLocaleDateString('en-GB'); 
+  }
+  
+
+  const [fullName, setFullName] = useState(member?.fullName || '');
+  const [phoneNumber, setPhoneNumber] = useState(member?.phoneNumber || '');
+  const [email, setEmail] = useState(member?.email || '');
+  const [group, setGroup] = useState(member?.group || '');
+  const [birthday, setBirthday] = useState(formattedDate || '');
+
   return (
     <div className='bg-[#ffffff] py-20 lg:py-[120px]'>
       <div className='container mx-auto'>
@@ -12,7 +35,9 @@ const MemberForm = () => {
                 <div className='bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block'>
                   <RxPerson size={50} />
                 </div>
-                <div className='mb-10 text-center md:mb-16'>Add Member</div>
+                <div className='mb-10 text-center md:mb-16'>
+                 {action === 'view/edit' ? 'Member Details' : 'Add Member'}  
+                </div>
                 <form>
                   <div className='mb-6'>
                     <label
@@ -26,8 +51,8 @@ const MemberForm = () => {
                       name='fullName'
                       id='fullName'
                       className='border-[#E9EDF4] w-full rounded-md border bg-[#FCFDFE] py-3 px-5 text-base text-body-color placeholder-[#ACB6BE] outline-none focus:border-primary focus-visible:shadow-none'
-                      // value={fullName}
-                      // onChange={(e) => setFullName(e.target.value)}
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                     />
                   </div>
                   <div className='mb-4'>
@@ -42,9 +67,8 @@ const MemberForm = () => {
                       name='phoneNumber'
                       id='phoneNumber'
                       className='border-[#E9EDF4] w-full rounded-md border bg-[#FCFDFE] py-3 px-5 text-base text-body-color placeholder-[#ACB6BE] outline-none focus:border-primary focus-visible:shadow-none'
-
-                      // value={fullName}
-                      // onChange={(e) => setFullName(e.target.value)}
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
                     />
                   </div>
                   <div className='mb-4'>
@@ -55,13 +79,28 @@ const MemberForm = () => {
                       Email
                     </label>
                     <input
-                      type='text'
+                      type='email'
                       name='email'
                       id='email'
                       className='border-[#E9EDF4] w-full rounded-md border bg-[#FCFDFE] py-3 px-5 text-base text-body-color placeholder-[#ACB6BE] outline-none focus:border-primary focus-visible:shadow-none'
-
-                      // value={fullName}
-                      // onChange={(e) => setFullName(e.target.value)}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className='mb-4'>
+                    <label
+                      htmlFor='email'
+                      className='block text-gray-700 font-bold mb-2'
+                    >
+                      Birthday
+                    </label>
+                    <input
+                      type='text'
+                      name='birthday'
+                      id='birthday'
+                      className='border-[#E9EDF4] w-full rounded-md border bg-[#FCFDFE] py-3 px-5 text-base text-body-color placeholder-[#ACB6BE] outline-none focus:border-primary focus-visible:shadow-none'
+                      value={birthday}
+                      onChange={(e) => setBirthday(e.target.value)}
                     />
                   </div>
                   <div className='mb-4'>
@@ -76,16 +115,17 @@ const MemberForm = () => {
                       name='group'
                       id='group'
                       className='border-[#E9EDF4] w-full rounded-md border bg-[#FCFDFE] py-3 px-5 text-base text-body-color placeholder-[#ACB6BE] outline-none focus:border-primary focus-visible:shadow-none'
-                      // value={fullName}
-                      // onChange={(e) => setFullName(e.target.value)}
+                      value={group}
+                      onChange={(e) => setGroup(e.target.value)}
                     />
                   </div>
-                  <button
-                    type='submit'
-                    className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                  >
-                    Submit
-                  </button>
+                  <div className='mb-10'>
+                    <input
+                      type='submit'
+                      value='submit'
+                      className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                    />
+                  </div>
                 </form>
               </div>
             </div>
@@ -95,5 +135,7 @@ const MemberForm = () => {
     </div>
   );
 };
+
+
 
 export default MemberForm;

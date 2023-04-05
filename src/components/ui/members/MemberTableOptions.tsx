@@ -1,5 +1,6 @@
+import { useRouter } from 'next/router';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
-import MemberForm from './MemberForm';
+
 
 interface MemberOptionsProps {
   showOptions: boolean;
@@ -9,24 +10,24 @@ interface MemberOptionsProps {
 
 const MemberTableOptions = ({
   showOptions,
+  setShowOptions,
   selectedMember,
-  // setShowOptions,
-}: MemberOptionsProps) => {
-  // const toggleOptions = () => setShowOptions(!showOptions);
+}: 
+MemberOptionsProps) => {
+  const toggleOptions = () => setShowOptions && setShowOptions(!showOptions);
+  const router = useRouter();
 
-  const handleView = () => {
-    // Use the selectedMemberId to get the member
-    console.log('View Member:', selectedMember);
+  const handleView = async () => {
+    router.push(`/members/${selectedMember}`);
   };
 
   const handleEdit = () => {
-    console.log('Edit Member', selectedMember);
-    // toggleOptions();
+    router.push(`/members/${selectedMember}`);
   };
 
   const handleDelete = () => {
     console.log('Delete Member', selectedMember);
-    // toggleOptions();
+    toggleOptions();
   };
 
   const optionItems = [

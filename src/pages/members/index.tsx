@@ -5,14 +5,8 @@ import { API_BASEURL } from '../../utils/api';
 import MemberTableOptions from '../../components/ui/members/MemberTableOptions';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { Member } from '../../utils/member';
 
-interface Member {
-  id: string;
-  fullName: string;
-  phoneNumber: string;
-  email: string | null;
-  group: string;
-}
 
 interface MembersProps {
   data: Member[] | undefined;
@@ -20,6 +14,7 @@ interface MembersProps {
 
 export default function Members({ data }: MembersProps) {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const [showOptions, setShowOptions] = useState(false);
   const router = useRouter();
 
   const handleMemberOptionsToggle = (memberId: string) => {
@@ -30,8 +25,8 @@ export default function Members({ data }: MembersProps) {
     }
   };
 
-  const handleClick = (path: string) => {
-    router.push(path);
+  const handleClick = () => {
+    router.push('/members/add-member');
   }
 
   return (
@@ -40,7 +35,7 @@ export default function Members({ data }: MembersProps) {
         <h2>Members</h2>
         <div className='flex items-center'>
           <h2 className='hidden md:block mr-4'>Welcome Back, User</h2>
-          <button onClick={(e) => handleClick('/members/add-member')} className='bg-blue-500 text-white px-4 py-2 rounded-lg'>
+          <button onClick={() => handleClick()} className='bg-blue-500 text-white px-4 py-2 rounded-lg'>
             Add Member
           </button>
         </div>
@@ -76,12 +71,17 @@ export default function Members({ data }: MembersProps) {
                     <div className='sm:flex hidden justify-between items-center'>
                       <p>{member.group}</p>
                       <BsThreeDotsVertical
-                        onClick={() => handleMemberOptionsToggle(member.id)}
+                        onClick={() => {
+                          setShowOptions(!showOptions)
+                          handleMemberOptionsToggle(member.id)
+                        }
+                      }
                       />
                     </div>
                     {selectedMemberId === member.id && (
                       <MemberTableOptions
-                        showOptions={true}
+                        showOptions={showOptions}
+                        setShowOptions={setShowOptions}
                         selectedMember={selectedMemberId}
                       />
                     )}
