@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
             sameSite: 'strict',
-            maxAge: 60,
+            maxAge: 900, // 15 minutes in seconds
             path: '/',
           });
 
@@ -45,7 +45,7 @@ export async function middleware(request: NextRequest) {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
             sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60,
+            maxAge: 7 * 24 * 60 * 60, // 7 days
             path: '/',
           });
 
@@ -63,6 +63,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = { 
-  matcher: '/',
+  matcher: ['/', '/members'],
 }
 

@@ -1,7 +1,13 @@
+import { parse } from 'cookie';
 import { GetServerSideProps } from 'next';
 import { BsPersonFill, BsThreeDotsVertical } from 'react-icons/bs';
+import { API_BASEURL } from '../../utils/api';
+import MemberTableOptions from '../../components/ui/members/MemberTableOptions';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 interface Member {
+  id: string;
   fullName: string;
   phoneNumber: string;
   email: string | null;
@@ -9,15 +15,35 @@ interface Member {
 }
 
 interface MembersProps {
-  data: Member[];
+  data: Member[] | undefined;
 }
 
-export default function members({ data }: MembersProps) {
+export default function Members({ data }: MembersProps) {
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleMemberOptionsToggle = (memberId: string) => {
+    if (selectedMemberId === memberId) {
+      setSelectedMemberId(null);
+    } else {
+      setSelectedMemberId(memberId);
+    }
+  };
+
+  const handleClick = (path: string) => {
+    router.push(path);
+  }
+
   return (
     <div className='bg-gray-100 min-h-screen'>
       <div className='flex justify-between p-4'>
         <h2>Members</h2>
-        <h2>Welcome Back, User</h2>
+        <div className='flex items-center'>
+          <h2 className='hidden md:block mr-4'>Welcome Back, User</h2>
+          <button onClick={(e) => handleClick('/members/add-member')} className='bg-blue-500 text-white px-4 py-2 rounded-lg'>
+            Add Member
+          </button>
+        </div>
       </div>
       <div className='p-4'>
         <div className='w-full m-auto p-4 border rounded-lg bg-white overflow-y-auto'>
@@ -49,8 +75,16 @@ export default function members({ data }: MembersProps) {
                     </p>
                     <div className='sm:flex hidden justify-between items-center'>
                       <p>{member.group}</p>
-                      <BsThreeDotsVertical />
+                      <BsThreeDotsVertical
+                        onClick={() => handleMemberOptionsToggle(member.id)}
+                      />
                     </div>
+                    {selectedMemberId === member.id && (
+                      <MemberTableOptions
+                        showOptions={true}
+                        selectedMember={selectedMemberId}
+                      />
+                    )}
                   </li>
                 ))}
           </ul>
@@ -61,8 +95,35 @@ export default function members({ data }: MembersProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
- 
-  return {
-    props: {}, 
+  const { req } = context;
+  const cookies = parse(req.headers.cookie || '');
+  const accessToken = cookies.accessToken;
+
+  if (accessToken === undefined) {
+    return {
+      props: {},
+    };
   }
-}
+
+  try {
+    const res = await fetch(`${API_BASEURL}/members`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      method: 'GET',
+    });
+
+    if (res.ok) {
+      const data: Member[] = await res.json();
+      return {
+        props: { data },
+      };
+    }
+  } catch (error) {
+    console.log('Something went wrong accessing members', error);
+  }
+
+  return {
+    props: {},
+  };
+};
