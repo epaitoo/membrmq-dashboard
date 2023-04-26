@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
             sameSite: 'strict',
-            maxAge: 900, // 15 minutes in seconds
+            maxAge:  7 * 24 * 60 * 60, // 15 minutes in seconds
             path: '/',
           });
 

@@ -11,7 +11,7 @@ interface MemberDetailsProps {
 export default function MemberDetails({ member }: MemberDetailsProps) {
   return (
     <div>
-      <MemberForm member={member} action='view/edit' />
+      <MemberForm member={member} action='EDIT' />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 
-
 interface MemberOptionsProps {
   showOptions: boolean;
   setShowOptions?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -10,11 +9,8 @@ interface MemberOptionsProps {
 
 const MemberTableOptions = ({
   showOptions,
-  setShowOptions,
   selectedMember,
-}: 
-MemberOptionsProps) => {
-  const toggleOptions = () => setShowOptions && setShowOptions(!showOptions);
+}: MemberOptionsProps) => {
   const router = useRouter();
 
   const handleView = async () => {
@@ -25,9 +21,19 @@ MemberOptionsProps) => {
     router.push(`/members/${selectedMember}`);
   };
 
-  const handleDelete = () => {
-    console.log('Delete Member', selectedMember);
-    toggleOptions();
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(`/api/members/${selectedMember}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        router.push('/members');
+      } else {
+        console.log('Error Deleting Member');
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const optionItems = [

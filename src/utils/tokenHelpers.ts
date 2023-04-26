@@ -19,7 +19,7 @@ export const authTokenReq = async (
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
     sameSite: 'strict',
-    maxAge: 60,
+    maxAge: 7 * 24 * 60 * 60, 
     path: '/',
   });
 

@@ -1,29 +1,82 @@
-import { GetServerSideProps } from 'next';
-import Link from 'next/link';
 import { useState } from 'react';
 import { RxPerson } from 'react-icons/rx';
 import { Member } from '../../../utils/member';
+import { API_BASEURL } from '../../../utils/api';
+import router from 'next/router';
 
-interface MemberFormFieldsProps { 
+interface MemberFormFieldsProps {
   member?: Member;
   action?: string;
 }
-
-
 
 const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
   let formattedDate: string = '';
   if (member?.birthday !== undefined) {
     const date = new Date(member?.birthday);
-    formattedDate = date.toLocaleDateString('en-GB'); 
+    formattedDate = date.toLocaleDateString('en-GB');
   }
-  
 
   const [fullName, setFullName] = useState(member?.fullName || '');
   const [phoneNumber, setPhoneNumber] = useState(member?.phoneNumber || '');
   const [email, setEmail] = useState(member?.email || '');
   const [group, setGroup] = useState(member?.group || '');
   const [birthday, setBirthday] = useState(formattedDate || '');
+
+  interface reqBody {
+    fullName: string;
+    phoneNumber: string;
+    email?: string;
+    group: string;
+    birthday: string;
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const data: reqBody = {
+      fullName,
+      phoneNumber,
+      email,
+      group,
+      birthday,
+    };
+
+    if (data.email === '' || !data.email) {
+      delete data.email;
+    }
+
+    try {
+      if (action === 'EDIT') {
+        const res = await fetch(`/api/members/${member?.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) {
+          router.push('/members');
+        } else {
+          console.log('Error Updating Member');
+        }
+      } else if (action === 'CREATE') {
+        const res = await fetch('/api/members/add-member', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) {
+          router.push('/members');
+        } else {
+          console.log('Error Creating Member');
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className='bg-[#ffffff] py-20 lg:py-[120px]'>
@@ -36,9 +89,9 @@ const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
                   <RxPerson size={50} />
                 </div>
                 <div className='mb-10 text-center md:mb-16'>
-                 {action === 'view/edit' ? 'Member Details' : 'Add Member'}  
+                  {action === 'view/edit' ? 'Member Details' : 'Add Member'}
                 </div>
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className='mb-6'>
                     <label
                       htmlFor='fullName'
@@ -135,7 +188,5 @@ const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
     </div>
   );
 };
-
-
 
 export default MemberForm;
