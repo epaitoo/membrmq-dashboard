@@ -6,6 +6,7 @@ import MemberTableOptions from '../../components/ui/members/MemberTableOptions';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Member } from '../../utils/member';
+import Header from '../../components/ui/Header';
 
 
 interface MembersProps {
@@ -31,15 +32,12 @@ export default function Members({ data }: MembersProps) {
 
   return (
     <div className='bg-gray-100 min-h-screen'>
-      <div className='flex justify-between p-4'>
-        <h2>Members</h2>
-        <div className='flex items-center'>
-          <h2 className='hidden md:block mr-4'>Welcome Back, User</h2>
-          <button onClick={() => handleClick()} className='bg-blue-500 text-white px-4 py-2 rounded-lg'>
-            Add Member
-          </button>
-        </div>
-      </div>
+      <Header 
+        pageTitle='Members'
+        userName='User'
+        onClick={handleClick}
+        buttonName='Add Member'
+      />
       <div className='p-4'>
         <div className='w-full m-auto p-4 border rounded-lg bg-white overflow-y-auto'>
           <div className='my-3 p-2 grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer'>
