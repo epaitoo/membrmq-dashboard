@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { API_BASEURL } from '../../utils/api';
 import { serialize } from 'cookie';
+import { ACCESS_TOKEN, REFRESH_TOKEN, USERNAME } from '../../utils/tokenHelpers';
 
 
 export default async function handler(
@@ -18,19 +19,24 @@ export default async function handler(
     })
     if (response.ok) {
       res.setHeader('Set-Cookie', [
-        serialize('accessToken', '', {
+        serialize(ACCESS_TOKEN, '', {
           httpOnly: true,
           path: '/',
           sameSite: 'strict',
           expires:  new Date(0),
         }),
 
-        serialize('refreshToken', '', {
+        serialize(REFRESH_TOKEN, '', {
           httpOnly: true,
           path: '/',
           sameSite: 'strict',
           expires:  new Date(0),
         }),
+
+        serialize(USERNAME, '', {
+          path: '/',
+          expires:  new Date(0),
+        })
       ]);
 
       res.status(200).json({ message: 'Logged out successfully' })

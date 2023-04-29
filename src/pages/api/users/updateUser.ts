@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { API_BASEURL } from '../../../utils/api';
+import { serialize } from 'cookie';
+import { USERNAME } from '../../../utils/tokenHelpers';
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,6 +20,16 @@ export default async function handler(
     });
   
     if (response.ok) {
+
+      // set the username in cookies
+      const fullNameCookie = serialize(USERNAME, req.body.fullName, {
+        maxAge: 7 * 24 * 60 * 60,
+        path: '/',
+        httpOnly: false,
+      })
+
+      res.setHeader('Set-Cookie', [fullNameCookie]);
+
       res.status(200).json({
         message: 'Profile updated successfully',
       });

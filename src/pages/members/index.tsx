@@ -34,7 +34,6 @@ export default function Members({ data }: MembersProps) {
     <div className='bg-gray-100 min-h-screen'>
       <Header 
         pageTitle='Members'
-        userName='User'
         onClick={handleClick}
         buttonName='Add Member'
       />

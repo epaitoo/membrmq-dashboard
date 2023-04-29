@@ -3,9 +3,11 @@ import type { NextRequest } from 'next/server';
 import {
   ACCESS_TOKEN,
   REFRESH_TOKEN,
+  USERNAME,
   isTokenExpired,
 } from './utils/tokenHelpers';
 import { API_BASEURL } from './utils/api';
+import { getUserFullName } from './utils/user';
 
 export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value;
@@ -58,6 +60,14 @@ export async function middleware(request: NextRequest) {
             path: '/',
           });
 
+          const fullName = await getUserFullName(data.access_token);
+          
+          nextRes.cookies.set(USERNAME, fullName, {
+            httpOnly: false,
+            maxAge: 7 * 24 * 60 * 60, // 7 days
+            path: '/',
+          });
+
           return nextRes;
         }
       } catch (error) {
@@ -79,3 +89,4 @@ export const config = {
     '/users/:path*',
   ],
 };
+

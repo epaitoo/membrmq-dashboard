@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { serialize } from 'cookie';
 import jwtDecode from 'jwt-decode';
+import { getUserFullName } from './user';
 
 export const ACCESS_TOKEN: string = 'accessToken';
 export const REFRESH_TOKEN: string = 'refreshToken';
+export const USERNAME: string = 'username';
 
 export const authTokenReq = async (
   url: string,
@@ -31,7 +33,14 @@ export const authTokenReq = async (
     path: '/',
   });
 
-  return [accessToken, refreshToken];
+  const fullName = await getUserFullName(response.data.access_token);
+  const fullNameCookie = serialize(USERNAME, fullName, {
+    maxAge: 7 * 24 * 60 * 60,
+    path: '/',
+    httpOnly: false,
+  });
+
+  return [accessToken, refreshToken, fullNameCookie];
 };
 
 export const isTokenExpired = (token: string | undefined): boolean => {
@@ -42,8 +51,6 @@ export const isTokenExpired = (token: string | undefined): boolean => {
 
   return decodedToken.exp < currentTime;
 };
-
-//Logout 
 
 
 

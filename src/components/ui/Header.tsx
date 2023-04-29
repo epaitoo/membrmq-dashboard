@@ -2,7 +2,7 @@ import React from 'react';
 
 interface HeaderProps {
   pageTitle: string;
-  userName: string;
+  userName?: string;
   onClick: () => void;
   buttonName: string;
 }

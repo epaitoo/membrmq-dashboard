@@ -4,6 +4,8 @@ import TopCards from '../components/ui/TopCards';
 import BarChart from '../components/ui/BarChart';
 import RecentOrders from '../components/ui/RecentOrders';
 import router from 'next/router';
+import Cookies from 'js-cookie';
+import { USERNAME } from '../utils/tokenHelpers';
 
 export default function Home() {
   
@@ -22,6 +24,8 @@ export default function Home() {
     }
   };
 
+  const fullName = Cookies.get(USERNAME);
+
   return (
     <>
       <Head>
@@ -33,7 +37,7 @@ export default function Home() {
       <main className='bg-gray-100 min-h-screen'>
         <Header
           pageTitle='Dashboard'
-          userName='User'
+          userName={fullName}
           onClick={handleButtonClick}
           buttonName='Log Out'
         />

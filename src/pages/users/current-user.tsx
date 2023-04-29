@@ -51,7 +51,7 @@ export default function CurrentUser({ data }: ICurrentUserProps) {
     }
 
     try {
-      const res = await fetch('/api/users/currentUser', {
+      const res = await fetch('/api/users/updateUser', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export default function CurrentUser({ data }: ICurrentUserProps) {
     <div className='bg-gray-100 min-h-screen'>
       <Header
         pageTitle='User Profile'
-        userName='User'
+        userName={fullName !== null ? fullName : ''}
         onClick={handleButtonClick}
         buttonName='Log Out'
       />
