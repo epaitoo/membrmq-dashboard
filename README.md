@@ -9,6 +9,10 @@ Repo for App API [here](https://github.com/epaitoo/member-mq)
 
 Styled with Tailwind CSS.
 
+## Live Demo
+
+View Live Demo of the App [here](https://membrmq-dashboard.vercel.app)
+
 ## Features
 - CRUD Functionality for Members
 - User Management
