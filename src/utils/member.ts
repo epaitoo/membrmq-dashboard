@@ -4,5 +4,5 @@ export interface Member {
   phoneNumber: string;
   email?: string | null;
   group?: string;
-  birthday?: string
+  birthday?: string;
 }

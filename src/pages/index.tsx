@@ -6,9 +6,12 @@ import RecentOrders from '../components/ui/RecentOrders';
 import router from 'next/router';
 import Cookies from 'js-cookie';
 import { USERNAME } from '../utils/tokenHelpers';
+import { useState } from 'react';
+import ErrorComponent from '../components/ui/Error';
 
 export default function Home() {
-  
+  const [error, setError] = useState<string | null>('');
+
   const handleButtonClick = async () => {
     try {
       const res = await fetch('/api/logout', {
@@ -17,14 +20,23 @@ export default function Home() {
       if (res.ok) {
         router.push('/auth/signin');
       } else {
-        console.log('Cannot Logout User at this moment');
+        throw new Error(`${res.statusText}`);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: Error | any) {
+      setError(`Oops, something went wrong:, ${error.message}`);
+      console.log(error.message);
     }
   };
 
-  const fullName = Cookies.get(USERNAME);
+  const fullName = (() => {
+    try {
+      return Cookies.get(USERNAME) || '';
+    } catch (error: any) {
+      // setError(`Error getting fullName cookie:, ${error.message}`);
+      console.log('Error getting fullName cookie:', error.message);
+      return '';
+    }
+  })();
 
   return (
     <>
@@ -37,10 +49,13 @@ export default function Home() {
       <main className='bg-gray-100 min-h-screen'>
         <Header
           pageTitle='Dashboard'
-          userName={fullName}
+          userName={fullName !== '' && fullName !== null ? fullName : ''}
           onClick={handleButtonClick}
           buttonName='Log Out'
         />
+        <div>
+          {error && <ErrorComponent message={error} onClose={() => setError('')} />}
+        </div>
         <TopCards />
         <div className='p-4 grid md:grid-cols-3 grid-cols-1 gap-4'>
           <BarChart />

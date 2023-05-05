@@ -6,6 +6,8 @@ import { IUser } from '../../utils/user';
 import { useState } from 'react';
 import router from 'next/router';
 import Header from '../../components/ui/Header';
+import ErrorComponent from '../../components/ui/Error';
+import LoadingButton from '../../components/ui/LoadingButton';
 
 interface ICurrentUserProps {
   data: IUser | undefined;
@@ -21,6 +23,8 @@ export default function CurrentUser({ data }: ICurrentUserProps) {
   const [fullName, setFullName] = useState(data?.fullName || '');
   const [phoneNumber, setPhoneNumber] = useState(data?.phoneNumber || '');
   const [email, setEmail] = useState(data?.email || '');
+  const [error, setErrorMessage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleButtonClick = async () => {
     try {
@@ -30,15 +34,18 @@ export default function CurrentUser({ data }: ICurrentUserProps) {
       if (res.ok) {
         router.push('/auth/signin');
       } else {
-        console.log('Cannot Logout User at this moment');
+        const msg = await res.json();
+        throw new Error(`${msg.message}`);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: Error | any) {
+      setErrorMessage(`Oops, something went wrong:, ${error.message}`);
+      console.log(error.message);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const data: reqBody = {
       fullName,
@@ -61,10 +68,13 @@ export default function CurrentUser({ data }: ICurrentUserProps) {
       if (res.ok) {
         router.push('/users/current-user');
       } else {
-        console.log('Error Updating Member');
+        const msg = await res.json();
+        throw new Error(`${msg.message}`);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: Error | any) {
+      setErrorMessage(`Error Updating Member: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,6 +91,7 @@ export default function CurrentUser({ data }: ICurrentUserProps) {
           <div className='-mx-4 flex flex-wrap'>
             <div className='w-full px-4'>
               <div className='relative mx-auto max-w-[525px] overflow-hidden rounded-lg bg-white py-16 px-10 text-center sm:px-12 md:px-[60px]'>
+                <div>{error && <ErrorComponent message={error} onClose={() => setErrorMessage('')} />}</div>
                 <div className='mb-10 text-center md:mb-16'>
                   <div className='bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block'>
                     <RxPerson size={50} />
@@ -136,10 +147,10 @@ export default function CurrentUser({ data }: ICurrentUserProps) {
                       />
                     </div>
                     <div className='mb-10'>
-                      <input
-                        type='submit'
-                        value='Edit Profile'
-                        className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                      <LoadingButton
+                        isLoading={isLoading}
+                        buttonText='Edit Profile'
+                        loadingText='Loading...'
                       />
                     </div>
                   </form>
@@ -177,10 +188,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: { data },
       };
     } else {
-      console.log(`Something went wrong: ${res.statusText}`);
+      const msg = await res.json();
+      throw new Error(`${msg.message}`);
     }
-  } catch (error) {
-    console.log('Something went wrong accessing members', error);
+  } catch (error: Error | any) {
+    console.log('Cannot access Profile:', error.message);
   }
 
   return {

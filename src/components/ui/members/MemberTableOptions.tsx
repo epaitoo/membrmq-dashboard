@@ -28,11 +28,13 @@ const MemberTableOptions = ({
       });
       if (res.ok) {
         router.push('/members');
+        return; 
       } else {
-        console.log('Error Deleting Member');
+        const msg = await res.json();
+        throw new Error(`Error Deleting Member: ${msg.message}`);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: Error | any) {
+      console.error(error.message);
     }
   };
 

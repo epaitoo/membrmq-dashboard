@@ -21,13 +21,15 @@ export default async function handler(
         message: 'Member created successfully',
       });
     } else {
+      const msg = await response.json();
       res.status(response.status).json({
-        error: `Error Creating member: ${response.statusText}`,
+        message: `${msg.message}`,
       });
+      
     }
-  } catch (error: any) {
+  } catch (error: Error | any) {
     res.status(500).json({
-      error: `Error updating member: ${error.message}`
+      message: `Error updating member: ${error.message}`
     });
   }
 }

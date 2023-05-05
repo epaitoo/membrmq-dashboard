@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { RxPerson } from 'react-icons/rx';
+import ErrorComponent from '../ui/Error';
+import LoadingButton from '../ui/LoadingButton';
 
 interface IsSignUpProp {
   isSignUp: boolean;
@@ -11,35 +13,59 @@ interface IsSignUpProp {
 const AuthForm = ({ isSignUp }: IsSignUpProp): JSX.Element => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [error, setErrorMessage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
+  const resetForm = () => {
+    setEmail('');
+    setPassword('');
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+    setIsLoading(true);
+
     if (!email || !password) {
+      resetForm();
       setErrorMessage('Please enter a valid email and password');
       return;
     }
 
     try {
       if (!isSignUp) {
-        const res = await axios.post('/api/login', { email, password });
+        try {
+          const res = await axios.post('/api/login', { email, password });
+          resetForm();
 
-        if (res.status == 200) {
-          router.push('/');
+          if (res.status == 200) {
+            router.push('/');
+          }
+        } catch (error: Error | any) {
+          setErrorMessage(error.response.data.message);
+        } finally {
+          setIsLoading(false);
         }
+
       } else {
-        const res = await axios.post('/api/register', { email, password });
+        try {
+          const res = await axios.post('/api/register', { email, password });
 
-        if (res.status == 200) {
-          router.push('/');
+          if (res.status == 200) {
+            router.push('/');
+          }
+        } catch (error: Error | any) {
+          setErrorMessage(error.response.data.message);
+        } finally {
+          setIsLoading(false);
         }
+
       }
     } catch (error) {
-      console.error(error);
       setErrorMessage('An error occurred while signing up');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -59,11 +85,14 @@ const AuthForm = ({ isSignUp }: IsSignUpProp): JSX.Element => {
                   <div className='mb-10 text-center md:mb-16'>
                     {isSignUp ? 'Sign Up' : 'Sign In'}
                   </div>
-                  {errorMessage && (
-                    <div className='mb-10 text-center md:mb-16'>
-                      {errorMessage}
-                    </div>
-                  )}
+                  <div>
+                    {error && (
+                      <ErrorComponent
+                        message={error}
+                        onClose={() => setErrorMessage('')}
+                      />
+                    )}
+                  </div>
                 </div>
                 <form onSubmit={handleSubmit}>
                   <div className='mb-6'>
@@ -87,19 +116,19 @@ const AuthForm = ({ isSignUp }: IsSignUpProp): JSX.Element => {
                     />
                   </div>
                   <div className='mb-10'>
-                    <input
-                      type='submit'
-                      value={isSignUp ? 'Sign Up' : 'Sign In'}
-                      className='border-primary w-full cursor-pointer rounded-md border bg-blue-600 py-3 px-5 text-base text-white transition hover:bg-opacity-90'
+                    <LoadingButton
+                      isLoading={isLoading}
+                      buttonText={isSignUp ? 'Sign Up' : 'Sign In'}
+                      loadingText='Loading...'
                     />
                   </div>
                 </form>
-                <Link
+                {/* <Link
                   href='/'
                   className='mb-2 inline-block text-base text-[#adadad] hover:text-primary hover:underline'
                 >
                   Forget Password?
-                </Link>
+                </Link> */}
                 <p className='text-base text-[#adadad]'>
                   {isSignUp ? 'Already a member?' : 'Not a member yet? '}
                   <Link

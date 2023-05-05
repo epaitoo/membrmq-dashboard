@@ -1,2 +1,2 @@
-export const API_BASEURL: string =  'http://localhost:7001/api';
+export const API_BASEURL =  process.env.NEXT_PUBLIC_API_URL;
 

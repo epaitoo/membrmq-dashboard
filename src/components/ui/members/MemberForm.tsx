@@ -3,6 +3,8 @@ import { RxPerson } from 'react-icons/rx';
 import { Member } from '../../../utils/member';
 import router from 'next/router';
 import Header from '../Header';
+import ErrorComponent from '../Error';
+import LoadingButton from '../LoadingButton';
 
 interface MemberFormFieldsProps {
   member?: Member;
@@ -11,16 +13,19 @@ interface MemberFormFieldsProps {
 
 const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
   let formattedDate: string = '';
-  if (member?.birthday !== undefined) {
+  if (member?.birthday !== undefined && member?.birthday !== null) {
     const date = new Date(member?.birthday);
     formattedDate = date.toLocaleDateString('en-GB');
-  }
+  } 
 
   const [fullName, setFullName] = useState(member?.fullName || '');
   const [phoneNumber, setPhoneNumber] = useState(member?.phoneNumber || '');
   const [email, setEmail] = useState(member?.email || '');
   const [group, setGroup] = useState(member?.group || '');
   const [birthday, setBirthday] = useState(formattedDate || '');
+
+  const [error, setErrorMessage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   interface reqBody {
     fullName: string;
@@ -38,15 +43,16 @@ const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
       if (res.ok) {
         router.push('/auth/signin');
       } else {
-        console.log('Cannot Logout User at this moment');
+        throw new Error(`${res.statusText}`);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: Error | any) {
+      setErrorMessage(`Oops, something went wrong:, ${error.message}`);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const data: reqBody = {
       fullName,
@@ -72,7 +78,8 @@ const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
         if (res.ok) {
           router.push('/members');
         } else {
-          console.log('Error Updating Member');
+          const msg = await res.json();
+          throw new Error(`Error Updating Member: ${msg.message}`);
         }
       } else if (action === 'CREATE') {
         const res = await fetch('/api/members/add-member', {
@@ -85,11 +92,15 @@ const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
         if (res.ok) {
           router.push('/members');
         } else {
-          console.log('Error Creating Member');
+          const msg = await res.json();
+          throw new Error(`Error Creating Member: ${msg.message}`);
         }
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: Error | any) {
+      setErrorMessage(`${error.message}`);
+      console.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,6 +123,14 @@ const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
                   </div>
                   <div className='mb-10 text-center md:mb-16'>
                     {action === 'view/edit' ? 'Member Details' : 'Add Member'}
+                  </div>
+                  <div>
+                    {error && (
+                      <ErrorComponent
+                        message={error}
+                        onClose={() => setErrorMessage('')}
+                      />
+                    )}
                   </div>
                   <form onSubmit={handleSubmit}>
                     <div className='mb-6'>
@@ -194,11 +213,12 @@ const MemberForm = ({ member, action }: MemberFormFieldsProps) => {
                         onChange={(e) => setGroup(e.target.value)}
                       />
                     </div>
+
                     <div className='mb-10'>
-                      <input
-                        type='submit'
-                        value='submit'
-                        className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                      <LoadingButton
+                        isLoading={isLoading}
+                        buttonText='submit'
+                        loadingText='Loading...'
                       />
                     </div>
                   </form>

@@ -115,9 +115,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         props: { data },
       };
+    }else {
+      throw new Error(`Something went wrong accessing members: ${res.statusText}`);
     }
   } catch (error) {
-    console.log('Something went wrong accessing members', error);
+    console.log(error);
   }
 
   return {

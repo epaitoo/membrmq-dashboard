@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { authTokenReq } from '../../utils/tokenHelpers';
+import { API_BASEURL } from '../../utils/api';
 
 export default async function login(
   req: NextApiRequest,
@@ -7,9 +8,10 @@ export default async function login(
 ) {
   const { email, password } = req.body;
 
+
   try {
     const tokens = await authTokenReq(
-      'http://localhost:7001/api/auth/signin',
+      `${API_BASEURL}/auth/signin`,
       email,
       password
     );
@@ -17,7 +19,8 @@ export default async function login(
     res.setHeader('Set-Cookie', tokens);
 
     res.status(200).json({ message: 'Success!' });
-  } catch (error) {
-    res.json({ message: 'Invalid credentials!' });
+  } catch (error: Error | any) {
+    // console.log(error.message);
+    res.status(error.response.status).json({ message: `${error.response.data.message}` });
   }
 }

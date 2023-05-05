@@ -43,9 +43,10 @@ export default async function handler(
     } else {
       res.status(response.status).json({ message: `Something went wrong: ${response.statusText}` })
     }
-  } catch (error: any) {
+  } catch (error: Error | any) {
+    console.log(error);
     res.status(500).json({
-      error: `Error logging out: ${error.message}`
+      message: `Error logging out: ${error.message}`
     });
   }
 }

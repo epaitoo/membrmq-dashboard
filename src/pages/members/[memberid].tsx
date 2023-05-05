@@ -45,9 +45,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return {
         props: { member },
       };
+    } else {
+      throw new Error(`${response.statusText}`);
     }
-  } catch (error) {
-    console.log('Error getting Member:', error);
+  } catch (error: any) {
+    console.log('Oops, something went wrong:', error.message);
   }
 
   return {

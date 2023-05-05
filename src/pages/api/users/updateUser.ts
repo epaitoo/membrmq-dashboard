@@ -34,11 +34,12 @@ export default async function handler(
         message: 'Profile updated successfully',
       });
     } else {
+      const msg = await response.json();
       res.status(response.status).json({
-        error: `Error updating Profile: ${response.statusText}`,
+        message: `${msg.message}`,
       });
     }
-  } catch (error: any) {
+  } catch (error: Error | any) {
     res.status(500).json({
       error: `Error updating Profile: ${error.message}`
     });
