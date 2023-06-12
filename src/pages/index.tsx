@@ -8,6 +8,7 @@ import Cookies from 'js-cookie';
 import { USERNAME } from '../utils/tokenHelpers';
 import { useState } from 'react';
 import ErrorComponent from '../components/ui/Error';
+import Link from 'next/link';
 
 export default function Home() {
   const [error, setError] = useState<string | null>('');
@@ -53,8 +54,18 @@ export default function Home() {
           onClick={handleButtonClick}
           buttonName='Log Out'
         />
+        <div className='bg-yellow-200 text-yellow-800 py-4 text-center'>
+          The backend hosting for the project has reached its limit. Please
+          check the{' '}
+          <Link href='https://github.com/epaitoo/membrmq-dashboard'>
+            GitHub repository (Here)
+          </Link>{' '}
+          to view the project source code. Thanks!
+        </div>
         <div>
-          {error && <ErrorComponent message={error} onClose={() => setError('')} />}
+          {error && (
+            <ErrorComponent message={error} onClose={() => setError('')} />
+          )}
         </div>
         <TopCards />
         <div className='p-4 grid md:grid-cols-3 grid-cols-1 gap-4'>

@@ -47,7 +47,6 @@ const AuthForm = ({ isSignUp }: IsSignUpProp): JSX.Element => {
         } finally {
           setIsLoading(false);
         }
-
       } else {
         try {
           const res = await axios.post('/api/register', { email, password });
@@ -60,7 +59,6 @@ const AuthForm = ({ isSignUp }: IsSignUpProp): JSX.Element => {
         } finally {
           setIsLoading(false);
         }
-
       }
     } catch (error) {
       setErrorMessage('An error occurred while signing up');
@@ -77,6 +75,15 @@ const AuthForm = ({ isSignUp }: IsSignUpProp): JSX.Element => {
             <div className='w-full px-4'>
               <div className='relative mx-auto max-w-[525px] overflow-hidden rounded-lg bg-white py-16 px-10 text-center sm:px-12 md:px-[60px]'>
                 <div className='mb-10 text-center md:mb-16'>
+                  <div className='bg-yellow-200 text-yellow-800 py-4 text-center'>
+                    The backend hosting for the project  has reached its limit. Please check the{' '}
+                    <Link href='https://github.com/epaitoo/membrmq-dashboard'>
+                      GitHub repository (Here)
+                    </Link>{' '}
+                    to view the project source code.
+                    Thanks!
+                  </div>
+
                   <Link href='/' className='mx-auto inline-block max-w-[160px]'>
                     <div className='bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block'>
                       <RxPerson size={50} />
